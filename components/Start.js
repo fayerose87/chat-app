@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,8 @@ import {
 } from "react-native";
 
 //background image & chat icon
-const background = require('../assets/background.png');
-const icon = require('../assets/chaticon.png');
+const background = require("../assets/background.png");
+const icon = require("../assets/chaticon.png");
 
 export default class Start extends Component {
   constructor(props) {
@@ -24,14 +24,14 @@ export default class Start extends Component {
 
   // Check for username
   onGoToChat = (name, backgroundColor) => {
-    if(name == '') {
-      return Alert.alert('Please enter your name.');
+    if (name == "") {
+      return Alert.alert("Please enter your name.");
     }
-    this.props.navigation.navigate('Chat', {
+    this.props.navigation.navigate("Chat", {
       name: this.state.name,
       backgroundColor: this.state.backgroundColor,
-  });
-}
+    });
+  };
 
   render() {
     return (
@@ -40,49 +40,68 @@ export default class Start extends Component {
         resizeMode="cover"
         source={background}
       >
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome!</Text>
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome!</Text>
 
-     {/* white box */}
-      <View style={styles.box}>
+          {/* white box */}
+          <View style={styles.box}>
+            {/* enter user name */}
+            <View style={styles.nameBox}>
+              <Image style={styles.nameIcon} source={icon} />
+              <TextInput
+                style={styles.nameText}
+                onChangeText={(name) => this.setState({ name })}
+                value={this.state.name}
+                placeholder="Enter Your Name"
+                placeholderTextColor="#757083"
+              />
+            </View>
+            {/* end enter user name */}
 
-        {/* enter user name */}
-        <View style={styles.nameBox}>
-          <Image
-            style={styles.nameIcon}
-            source={icon}
-          />
-          <TextInput
-            style={styles.nameText}
-            onChangeText={(name) => this.setState({ name })}
-            value={this.state.name}
-            placeholder="Enter Your Name"
-            placeholderTextColor="#757083"
-            opacity="0.5"
-          />
-          </View>
-          {/* end enter user name */}
-
-          {/* pick background color */}
+            {/* pick background color */}
             <View style={styles.colorPickerContainer}>
               <Text style={styles.chooseColor}>Choose Background Color:</Text>
               <View style={styles.colorPicker}>
                 <TouchableOpacity
                   //#090C08; #474056; #8A95A5; #B9C6AE colors
-                  style={[styles.colors, styles.black, this.state.backgroundColor === '#090c08' ? styles.border : null ]}
-                  onPress={() => this.setState({backgroundColor: '#090c08'})}
+                  style={[
+                    styles.colors,
+                    styles.black,
+                    this.state.backgroundColor === "#090c08"
+                      ? styles.border
+                      : null,
+                  ]}
+                  onPress={() => this.setState({ backgroundColor: "#090c08" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.colors, styles.purple, this.state.backgroundColor === '#474056' ? styles.border : null ]}
-                  onPress={() => this.setState({backgroundColor: '#474056'})}
+                  style={[
+                    styles.colors,
+                    styles.purple,
+                    this.state.backgroundColor === "#474056"
+                      ? styles.border
+                      : null,
+                  ]}
+                  onPress={() => this.setState({ backgroundColor: "#474056" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.colors, styles.gray, this.state.backgroundColor === '#8A95A5' ? styles.border : null ]}
-                  onPress={() => this.setState({backgroundColor: '#8A95A5'})}
+                  style={[
+                    styles.colors,
+                    styles.gray,
+                    this.state.backgroundColor === "#8A95A5"
+                      ? styles.border
+                      : null,
+                  ]}
+                  onPress={() => this.setState({ backgroundColor: "#8A95A5" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.colors, styles.green, this.state.backgroundColor === '#B9C6AE' ? styles.border : null ]}
-                  onPress={() => this.setState({backgroundColor: '#B9C6AE'})}
+                  style={[
+                    styles.colors,
+                    styles.green,
+                    this.state.backgroundColor === "#B9C6AE"
+                      ? styles.border
+                      : null,
+                  ]}
+                  onPress={() => this.setState({ backgroundColor: "#B9C6AE" })}
                 ></TouchableOpacity>
               </View>
             </View>
@@ -93,7 +112,10 @@ export default class Start extends Component {
                 accessibilityHint="Takes you to the chat screen."
                 accessibilityRole="button"
                 style={styles.button}
-                onPress={() => this.onGoToChat(this.state.name, this.state.backgroundColor)}>  
+                onPress={() =>
+                  this.onGoToChat(this.state.name, this.state.backgroundColor)
+                }
+              >
                 <Text style={styles.buttonText}>Start Chatting</Text>
               </TouchableOpacity>
             </View>
@@ -200,8 +222,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   border: {
-    borderStyle: 'solid',
+    borderStyle: "solid",
     borderWidth: 3,
-    borderColor: '#757083',
+    borderColor: "#757083",
   },
 });
