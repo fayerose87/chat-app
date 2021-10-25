@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
@@ -7,6 +7,10 @@ import "react-native-gesture-handler";
 // import the screens
 import Start from "./components/Start";
 import Chat from "./components/Chat";
+
+// ignore setting a time warning
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Setting a timer"]);
 
 // Create the navigator
 const Stack = createStackNavigator();
