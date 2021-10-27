@@ -18,13 +18,16 @@ const icon = require("../assets/chaticon.png");
 export default class Start extends Component {
   constructor(props) {
     super(props);
-    this.state = { name: "", backgroundColor: "#757083" };
+    this.state = { name: "", backgroundColor: "" };
   }
 
   // Check for username
   onGoToChat = (name, backgroundColor) => {
     if (name == "") {
       return Alert.alert("Please enter your name.");
+    }
+    if (backgroundColor == "") {
+      return Alert.alert("Please choose a color.");
     }
     this.props.navigation.navigate("Chat", {
       name: this.state.name,
