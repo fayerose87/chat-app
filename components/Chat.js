@@ -379,7 +379,6 @@ export default class Chat extends React.Component {
             renderInputToolbar={this.renderInputToolbar.bind(this)}
             renderActions={this.renderCustomActions}
             renderCustomView={this.renderCustomView}
-            renderSystemMessage={this.renderSystemMessage.bind(this)}
             isTyping={true}
             renderUsernameOnMessage={true}
             isConnected={this.state.isConnected}
