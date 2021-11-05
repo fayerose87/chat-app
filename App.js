@@ -16,9 +16,6 @@ LogBox.ignoreLogs(["Setting a timer"]);
 const Stack = createStackNavigator();
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
       <NavigationContainer>

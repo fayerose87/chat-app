@@ -1,11 +1,10 @@
-import React, { useState, Component } from "react";
+import React, { Component } from "react";
 import {
   View,
   Text,
   TextInput,
   Alert,
   StyleSheet,
-  Pressable,
   ImageBackground,
   Image,
   TouchableOpacity,
@@ -43,7 +42,7 @@ export default class Start extends Component {
         source={background}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>Welcome!</Text>
+          <Text style={styles.title}>Hello!</Text>
 
           {/* white box */}
           <View style={styles.box}>
@@ -66,6 +65,10 @@ export default class Start extends Component {
               <View style={styles.colorPicker}>
                 <TouchableOpacity
                   //#090C08; #474056; #8A95A5; #B9C6AE colors
+                  accessible={true}
+                  accessibilityLabel="Black background option"
+                  accissibilityHint="Sets your chat background color to black"
+                  accessibilityRole="button"
                   style={[
                     styles.colors,
                     styles.black,
@@ -76,6 +79,10 @@ export default class Start extends Component {
                   onPress={() => this.setState({ backgroundColor: "#090c08" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="Purple background option"
+                  accissibilityHint="Sets your chat background color to purple"
+                  accessibilityRole="button"
                   style={[
                     styles.colors,
                     styles.purple,
@@ -86,6 +93,10 @@ export default class Start extends Component {
                   onPress={() => this.setState({ backgroundColor: "#474056" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="Gray background option"
+                  accissibilityHint="Sets your chat background color to gray"
+                  accessibilityRole="button"
                   style={[
                     styles.colors,
                     styles.gray,
@@ -96,6 +107,10 @@ export default class Start extends Component {
                   onPress={() => this.setState({ backgroundColor: "#8A95A5" })}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="Green background option"
+                  accissibilityHint="Sets your chat background color to green"
+                  accessibilityRole="button"
                   style={[
                     styles.colors,
                     styles.green,

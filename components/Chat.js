@@ -1,29 +1,48 @@
 import React from "react";
-import { View, Platform, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  Text,
+  Platform,
+  KeyboardAvoidingView,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
 import {
   Bubble,
   GiftedChat,
   Day,
   InputToolbar,
+  Send,
+  Composer,
 } from "react-native-gifted-chat";
+import { IconButton } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
+import MapView from "react-native-maps";
+import CustomActions from "./CustomActions";
 
 const firebase = require("firebase");
 require("firebase/firestore");
+
+const chatBackground = require("../assets/chat-bubbles.png");
 
 export default class Chat extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isTyping: false,
       messages: [],
       uid: 0,
-      loggedInText: "",
+      loginText: "Authenticating..",
       user: {
         _id: "",
-        username: "",
+        name: "",
+        avatar: "",
       },
       isConnected: false,
+      dotColor: "",
+      image: null,
+      location: null,
     };
 
     if (!firebase.apps.length) {
@@ -66,8 +85,8 @@ export default class Chat extends React.Component {
               user: {
                 _id: user.uid,
                 name: name,
+                avatar: "https://placeimg.com/140/140/any",
               },
-              loggedInText: `${this.props.route.params.name} has entered the chat`,
             });
             // Create reference to the active users messages
             this.referenceMessagesUser = firebase
@@ -89,23 +108,10 @@ export default class Chat extends React.Component {
   }
 
   componentWillUnmount() {
-    // stop online authentication
-    this.authUnsubscribe();
-    this.unsubscribe();
-  }
-
-  async getMessages() {
-    let messages = "";
-    let uid = "";
-    try {
-      messages = (await AsyncStorage.getItem("messages")) || [];
-      uid = await AsyncStorage.getItem("uid");
-      this.setState({
-        messages: JSON.parse(messages),
-        uid: JSON.parse(uid),
-      });
-    } catch (error) {
-      console.log(error.message);
+    if (this.state.isConnected == true) {
+      // stop online authentication
+      this.authUnsubscribe();
+      this.unsubscribe();
     }
   }
 
@@ -130,8 +136,10 @@ export default class Chat extends React.Component {
       uid: this.state.uid,
       _id: message._id,
       createdAt: message.createdAt,
-      text: message.text,
+      text: message.text || null,
       user: message.user,
+      image: message.image || null,
+      location: message.location || null,
     });
   }
 
@@ -181,24 +189,23 @@ export default class Chat extends React.Component {
     // go through each document
     querySnapshot.forEach((doc) => {
       // get the QueryDocumentSnapshot's data
-      let data = doc.data();
+      var data = doc.data();
       messages.push({
         _id: data._id,
-        text: data.text,
         createdAt: data.createdAt.toDate(),
-        user: data.user,
+        text: data.text || "",
+        user: {
+          _id: data.user._id,
+          name: data.user.name,
+        },
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
       messages,
     });
   };
-
-  renderAvatar(props) {
-    return (
-      <Avatar {...props} containerStyle={{ backgroundColor: "#ffffff" }} />
-    );
-  }
 
   // Sets System Message color
   renderDay(props) {
@@ -214,12 +221,49 @@ export default class Chat extends React.Component {
   renderInputToolbar(props) {
     if (this.state.isConnected === false) {
     } else {
-      return <InputToolbar {...props} />;
+      return <InputToolbar {...props} containerStyle={[styles.inputToolBar]} />;
     }
+  }
+
+  renderComposer(props) {
+    return (
+      <Composer
+        {...props}
+        placeholder={"Type a message..."}
+        placeholderColor={"#BCBCBC"}
+        textInputStyle={styles.composerText}
+      />
+    );
+  }
+
+  // shows the Action menu (imagePicker, Camera, Location) sub-menu in Chat window
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  //renders a Map View when the message is a location
+  renderCustomView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          showsUserLocation={true}
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            longitude: Number(currentMessage.location.longitude),
+            latitude: Number(currentMessage.location.latitude),
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
   }
 
   renderBubble(props) {
     let backgroundColor = this.props.route.params.backgroundColor;
+    //purple
     if (backgroundColor == "#474056") {
       return (
         <Bubble
@@ -243,6 +287,7 @@ export default class Chat extends React.Component {
         />
       );
     }
+    // gray
     if (backgroundColor == "#8A95A5") {
       return (
         <Bubble
@@ -266,6 +311,7 @@ export default class Chat extends React.Component {
         />
       );
     }
+    //green
     if (backgroundColor == "#B9C6AE") {
       return (
         <Bubble
@@ -288,6 +334,7 @@ export default class Chat extends React.Component {
           }}
         />
       );
+      //black
     } else {
       return (
         <Bubble
@@ -321,20 +368,50 @@ export default class Chat extends React.Component {
           backgroundColor: this.props.route.params.backgroundColor,
         }}
       >
-        <GiftedChat
-          messages={this.state.messages}
-          onSend={(messages) => this.onSend(messages)}
-          user={this.state.user}
-          renderBubble={this.renderBubble.bind(this)}
-          renderDay={this.renderDay.bind(this)}
-          renderInputToolbar={this.renderInputToolbar.bind(this)}
-          showUserAvatar
-          inTyping={true}
-        />
-        {Platform.OS === "android" ? (
-          <KeyboardAvoidingView behavior="height" />
-        ) : null}
+        <ImageBackground style={styles.chatBackground} source={chatBackground}>
+          <Text>{this.state.loggedInText}</Text>
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={(messages) => this.onSend(messages)}
+            user={this.state.user}
+            renderBubble={this.renderBubble.bind(this)}
+            renderDay={this.renderDay.bind(this)}
+            renderInputToolbar={this.renderInputToolbar.bind(this)}
+            renderActions={this.renderCustomActions}
+            renderCustomView={this.renderCustomView}
+            renderSystemMessage={this.renderSystemMessage.bind(this)}
+            isTyping={true}
+            renderUsernameOnMessage={true}
+            isConnected={this.state.isConnected}
+            renderSend={(props) => {
+              return (
+                <Send {...props}>
+                  <IconButton
+                    icon="send-circle"
+                    style={{ paddingTop: 17 }}
+                    size={36}
+                    color="#696969"
+                  />
+                </Send>
+              );
+            }}
+          />
+          {Platform.OS === "android" ? (
+            <KeyboardAvoidingView behavior="height" />
+          ) : null}
+        </ImageBackground>
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  inputToolBar: {
+    paddingTop: 5,
+  },
+  chatBackground: {
+    width: "100%",
+    height: "100%",
+    flex: 1,
+  },
+});
